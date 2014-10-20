@@ -32,7 +32,7 @@ class CLIInput():
         def getter(name):
             default_value = default.get(name)
             default_value = '' if default_value else default_value
-            return input('{0} [{1}]'.format(name, default_value))
+            return input('{0} [{1}]: '.format(name, default_value))
 
         title = getter('title')
         keys = ['user', 'password', 'other']
