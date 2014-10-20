@@ -1,30 +1,37 @@
 # coding: utf-8
+import sys
 from argparse import ArgumentParser
-from .entrystore import EntryStore
+from .entrystore import EntryStore, PwwError
 from .inputs import CLIInput
 
 
-class AddCommand:
+class Command:
     def __init__(self, title, homedir, _input):
         self.title = title
         self.home = homedir
         self._input = _input
 
+    def execute(self, cmd):
+        try:
+            with EntryStore.load(self.home, self._input) as store:
+                return cmd(self, store)
+        except PwwError as err:
+            print(err, file=sys.stderr)
+
+
+class AddCommand(Command):
     def __call__(self):
-        with EntryStore.load(self.home, self._input) as store:
+        def cmd(_self, store):
             title, entry = self._input.get_entry_info({'title': self.title})
             store.add(title, **entry)
             store.save()
 
+        super().execute(cmd)
 
-class ShowCommand:
-    def __init__(self, title, homedir, _input):
-        self.title = title
-        self.home = homedir
-        self._input = _input
 
+class ShowCommand(Command):
     def __call__(self):
-        with EntryStore.load(self.home, self._input) as store:
+        def cmd(self, store):
             selector = self._input.entry_selector
             title, values = store.select_one(self.title, selector)
             print('title: ', title)
@@ -33,15 +40,11 @@ class ShowCommand:
             print('other: ', values['other'])
             return title, values
 
+        return super().execute(cmd)
 
-class ChangeCommand:
-    def __init__(self, title, homedir, _input):
-        self.title = title
-        self.home = homedir
-        self._input = _input
-
+class ChangeCommand(Command):
     def __call__(self):
-        with EntryStore.load(self.home, self._input) as store:
+        def cmd(self, store):
             selector = self._input.entry_selector
             title, default = store.select_one(self.title, selector)
             default['title'] = title
@@ -49,6 +52,7 @@ class ChangeCommand:
             store.change(title, entry)
             store.save()
 
+        super().execute(cmd)
 
 class CommandFactory:
     def __init__(self, home):

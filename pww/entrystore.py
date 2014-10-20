@@ -8,6 +8,13 @@ ENTRIES_FILE = 'entries'
 USER_FILE = 'user'
 
 
+class PwwError(Exception):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
 class EntryStore:
     @staticmethod
     @contextmanager
@@ -47,7 +54,10 @@ class EntryStore:
         encrypted_data = self.data_file.read()
         if len(encrypted_data):
             plain_data = self.cipher.decrypt(encrypted_data)
-            entries = json.loads(plain_data.decode())
+            try:
+                entries = json.loads(plain_data.decode())
+            except UnicodeDecodeError:
+                raise PwwError("pww can't read entries data. You may input invalid author info.")
         else:
             entries = {}
 
@@ -59,7 +69,7 @@ class EntryStore:
         """
 
         if title in self.entries.keys():
-            raise Exception('already stored')
+            raise PwwError('already stored')
         entry = {"user": user, "password": password, "other": other}
         self.entries[title] = entry
 
