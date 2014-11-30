@@ -67,12 +67,22 @@ def test_entry_can_be_searched_by_begins_with_match():
 
 def test_entry_can_be_chaned_values():
     store.add('title', 'user', 'pass')
-    store.change('title', {'user': 'chusr'})
+    store.change('title', 'title', {'user': 'chusr'})
 
     entry = store.search('title')['title']
     assert entry['user'] == 'chusr'
     assert entry['password'] == 'pass'
 
+def test_entry_can_be_changed_title():
+    store.add('old_title', 'user', 'pass')
+    store.change('old_title', 'new_title', {'user': 'chusr'})
+
+    entries = store.search('old_title')
+    assert len(entries) == 0
+
+    entry = store.search('new_title')['new_title']
+    assert entry['user'] == 'chusr'
+    assert entry['password'] == 'pass'
 
 def test_entries_can_be_saved():
     with BytesIO() as b:

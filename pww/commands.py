@@ -48,8 +48,8 @@ class ChangeCommand(Command):
             selector = self._input.entry_selector
             title, default = store.select_one(self.title, selector)
             default['title'] = title
-            title, entry = self._input.get_entry_info(default)
-            store.change(title, entry)
+            new_title, entry = self._input.get_entry_info(default)
+            store.change(title, new_title, entry)
             store.save()
 
         super().execute(cmd)

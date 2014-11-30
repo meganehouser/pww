@@ -100,14 +100,19 @@ class EntryStore:
             t, v = selector(entries)
             return t, v.copy()
 
-    def change(self, title, values):
+    def change(self, old_title, new_title, values):
         """
         Method that change entry values.
         title: str
         values: dict
         """
-
-        self.entries[title].update(values)
+        if old_title == new_title:
+            self.entries[old_title].update(values)
+        else:
+            entry = self.entries[old_title]
+            entry.update(values)
+            self.entries[new_title] = entry 
+            del self.entries[old_title]
 
     def save(self):
         """
