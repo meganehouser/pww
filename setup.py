@@ -3,9 +3,9 @@ from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
 __author__ = 'Satoshi Terajima <sleepy.st818@gmail.com>'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
-requires = ['pycrypto==2.6.1']
+requires = ['pycryptodome==3.6.6']
 
 entry_points={
     "console_scripts": ["pww=pww.pww:main"]
